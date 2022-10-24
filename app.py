@@ -25,9 +25,8 @@ def testing_function():
     #     for post in blog_posts:
     #         x.append(post)
     #     print(x)
-    x = "123"
+    x = "213"
     return jsonify({"message" : str(x)}),200
-
 
 
 if __name__ == '__main__':
