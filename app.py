@@ -1,33 +1,13 @@
 from flask import Flask, render_template, jsonify
 from flask_cors import CORS
 from flask_restful import Api
-import pymysql
+from sqlalchemy import create_engine
+from sqlalchemy import text
 
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
-def get_data_sql(code):
-    db_connect = pymysql.connect(
-        host='flask-backend.ckxv07dhtiyg.ap-northeast-1.rds.amazonaws.com',
-        user='admin',
-        passwd='12345678',
-        port=3306,)
-
-    cursor = db_connect.cursor()
-
-    # sql = '''CREATE TABLE ecdsa (address STRING,ecdsa_code STRING);'''
-    sql = "use flaskbackend"
-    cursor.execute(sql)
-    #'''SELECT * FROM ecdsa'''
-    sql = code
-    cursor.execute(sql)
-
-    data = cursor.fetchall()
-
-    cursor.connection.commit()
-
-    return data
 
 @app.route("/")
 def home():
@@ -35,8 +15,16 @@ def home():
 
 @app.route("/testing", methods=['GET'])
 def testing_function():
-    x = get_data_sql('SELECT * from ecdsa')
-    return jsonify({"message" : x}),200
+    DATABASE_URL  = 'mysql://admin:12345678@flask-backend.ckxv07dhtiyg.ap-northeast-1.rds.amazonaws.com:3306/'
+
+    engine = create_engine(DATABASE_URL)
+
+
+    with engine.connect() as connection:
+        connection.execute("use flaskbackend")
+        query = text("SELECT * FROM ecdsa")
+        blog_posts = connection.execute(query)
+    return jsonify({"message" : blog_posts}),200
 
 
 
